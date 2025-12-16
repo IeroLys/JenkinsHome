@@ -25,16 +25,18 @@ tasks.withType(Test) {
     systemProperty "file.encoding", "UTF-8"
 }
 
+jacoco {
+    toolVersion = "0.8.11" // можно не указывать — будет использована версия по умолчанию
+}
+
 jacocoTestReport {
+    dependsOn test // Гарантирует, что сначала запустятся тесты
     reports {
-        xml.required = true
-        html.required = true
-    }
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['**/*Test.class', '**/*Exception.class'])
-        })))
+        xml.required = true   // Обязательно — Jenkins JaCoCo плагин читает XML
+        html.required = true  // Для удобного просмотра локально
     }
 }
-test.finalizedBy jacocoTestReport
+
+// Автоматически запускать отчёт после тестов
+test.finalizedBy(jacocoTestReport)
 
